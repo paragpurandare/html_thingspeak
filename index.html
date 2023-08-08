@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ThingSpeak Data and Graph Display</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <h1>ThingSpeak Data and Graph Display</h1>
+    
+    <!-- Div to display the data -->
+    <div id="dataContainer"></div>
+    
+    <!-- Div to display the graph -->
+    <div id="graphContainer"></div>
+
+    <script>
+        // ThingSpeak channel ID and Read API Key
+        const channelID = '2027031';
+        const apiKey = 'RNOYLY6YZOO174YU';
+
+        // URL to retrieve the latest data from the ThingSpeak channel
+        const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${apiKey}&results=1`;
+
+        // Function to fetch data from ThingSpeak and display it
+        async function fetchData() {
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.feeds && data.feeds.length > 0) {
+                    const latestEntry = data.feeds[0];
+                    const dataHtml = `
+                        <p>Field 1: ${latestEntry.field1}</p>
+                        <p>Field 2: ${latestEntry.field2}</p>
+                        <!-- Add more fields as needed -->
+                    `;
+                    document.getElementById('dataContainer').innerHTML = dataHtml;
+
+                    // Embed code for the graph visualization
+                    const graphEmbedCode = `
+                        <iframe width="100%" height="400" style="border: 1px solid #cccccc;" 
+                            src="https://thingspeak.com/channels/${channelID}/charts/1?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line"></iframe>
+                    `;
+                    document.getElementById('graphContainer').innerHTML = graphEmbedCode;
+                } else {
+                    document.getElementById('dataContainer').innerHTML = '<p>No data available.</p>';
+                    document.getElementById('graphContainer').innerHTML = '<p>No graph available.</p>';
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                document.getElementById('dataContainer').innerHTML = '<p>Error fetching data.</p>';
+                document.getElementById('graphContainer').innerHTML = '<p>Error loading graph.</p>';
+            }
+        }
+
+        // Call the fetchData function to fetch and display data
+        fetchData();
+    </script>
+</body>
+</html>
